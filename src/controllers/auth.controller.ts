@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { IUser } from "../interfaces";
+import {ILogin, IUser} from "../interfaces";
 import { authService } from "../services";
 
 class AuthController {
@@ -22,6 +22,17 @@ class AuthController {
       await authService.registerVerify(token);
 
       return res.json("OK");
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const body = req.body as ILogin;
+      const jwtTokens = await authService.login(body);
+
+      return res.json({ data: jwtTokens });
     } catch (e) {
       next(e);
     }

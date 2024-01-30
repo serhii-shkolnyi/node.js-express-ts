@@ -17,4 +17,10 @@ router.put(
   authController.registerVerify,
 );
 
+router.post(
+  "/login",
+  commonMiddleware.isBodyValid(UserValidator.login),
+  authController.login,
+);
+
 export const authRouter = router;

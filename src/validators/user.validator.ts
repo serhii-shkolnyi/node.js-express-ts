@@ -16,4 +16,9 @@ export class UserValidator {
     password: this.password.required(),
     userName: this.userName.required(),
   });
+
+  public static login = joi.object({
+    email: this.email.required(),
+    password: this.password.required(),
+  });
 }

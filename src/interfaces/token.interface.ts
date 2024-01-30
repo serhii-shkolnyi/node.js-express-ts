@@ -11,7 +11,7 @@ export interface ITokensPair {
   refreshToken: string;
 }
 
-export interface IToken extends ITokensPair {
+export interface IToken extends ITokensPair, Document {
   _userId: Types.ObjectId;
 }
 

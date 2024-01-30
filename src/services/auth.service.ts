@@ -1,10 +1,15 @@
 import { EActionTokenType, EEmailAction, EUserStatus } from "../enums";
 import { ApiError } from "../errors";
-import { IUser } from "../interfaces";
-import { actionTokenRepository, userRepository } from "../repositories";
+import { ILogin, ITokensPair, IUser } from "../interfaces";
+import {
+  actionTokenRepository,
+  tokenRepository,
+  userRepository,
+} from "../repositories";
 import { actionTokenService } from "./action-token.service";
 import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
+import { tokenService } from "./token.service";
 
 class AuthService {
   public async register(dto: Partial<IUser>): Promise<IUser> {
@@ -65,6 +70,27 @@ class AuthService {
         userName: user.userName,
       }),
     ]);
+  }
+
+  public async login(dto: ILogin): Promise<ITokensPair> {
+    const user = await userRepository.getOneByParams({ email: dto.email });
+    if (!user) {
+      throw new ApiError("Not valid email or password", 401);
+    }
+
+    const isMatch = await passwordService.compare(dto.password, user.password);
+    if (!isMatch) {
+      throw new ApiError("Not valid email or password", 401);
+    }
+
+    if (user.userStatus !== "active") {
+      throw new ApiError("Verify your account", 403);
+    }
+
+    const jwtTokens = tokenService.generateTokenPair({ userId: user._id });
+    await tokenRepository.create({ ...jwtTokens, _userId: user._id });
+
+    return jwtTokens;
   }
 }
 
