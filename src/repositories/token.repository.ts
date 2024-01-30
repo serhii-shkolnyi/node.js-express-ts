@@ -13,6 +13,12 @@ class TokenRepository {
   ): Promise<IToken> {
     return await Token.findOne(params);
   }
+
+  public async deleteManyByParams(
+    params: FilterQuery<Partial<IToken>>,
+  ): Promise<void> {
+    await Token.deleteMany(params);
+  }
 }
 
 export const tokenRepository = new TokenRepository();

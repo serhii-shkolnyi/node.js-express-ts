@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { ILogin, IUser } from "../interfaces";
+import { ILogin, IToken, IUser } from "../interfaces";
 import { authService } from "../services";
 
 class AuthController {
@@ -33,6 +33,18 @@ class AuthController {
       const jwtTokens = await authService.login(body);
 
       return res.json({ data: jwtTokens });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async logoutAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.res.locals.jwtPayload as Partial<IToken>;
+
+      await authService.logoutAll(userId);
+
+      return res.sendStatus(204);
     } catch (e) {
       next(e);
     }

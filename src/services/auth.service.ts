@@ -1,6 +1,6 @@
 import { EActionTokenType, EEmailAction, EUserStatus } from "../enums";
 import { ApiError } from "../errors";
-import { ILogin, ITokensPair, IUser } from "../interfaces";
+import { ILogin, IToken, ITokensPair, IUser } from "../interfaces";
 import {
   actionTokenRepository,
   tokenRepository,
@@ -91,6 +91,10 @@ class AuthService {
     await tokenRepository.create({ ...jwtTokens, _userId: user._id });
 
     return jwtTokens;
+  }
+
+  public async logoutAll(dto: Partial<IToken>): Promise<void> {
+    await tokenRepository.deleteManyByParams({ _userId: dto });
   }
 }
 
