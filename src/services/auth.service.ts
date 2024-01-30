@@ -1,6 +1,14 @@
+import { Types } from "mongoose";
+
 import { EActionTokenType, EEmailAction, EUserStatus } from "../enums";
 import { ApiError } from "../errors";
-import { ILogin, IToken, ITokensPair, IUser } from "../interfaces";
+import {
+  ILogin,
+  IToken,
+  ITokenPayload,
+  ITokensPair,
+  IUser,
+} from "../interfaces";
 import {
   actionTokenRepository,
   tokenRepository,
@@ -95,6 +103,23 @@ class AuthService {
 
   public async logoutAll(dto: Partial<IToken>): Promise<void> {
     await tokenRepository.deleteManyByParams({ _userId: dto });
+  }
+
+  public async refresh(
+    jwtPayload: ITokenPayload,
+    refreshToken: string,
+  ): Promise<ITokensPair> {
+    await tokenRepository.deleteOneByParams({ refreshToken });
+
+    const jwtTokens = tokenService.generateTokenPair({
+      userId: jwtPayload.userId,
+    });
+    await tokenRepository.create({
+      ...jwtTokens,
+      _userId: new Types.ObjectId(jwtPayload.userId),
+    });
+
+    return jwtTokens;
   }
 }
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { ILogin, IToken, IUser } from "../interfaces";
+import { ILogin, IToken, ITokenPayload, IUser } from "../interfaces";
 import { authService } from "../services";
 
 class AuthController {
@@ -45,6 +45,19 @@ class AuthController {
       await authService.logoutAll(userId);
 
       return res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+      const refreshToken = req.res.locals.refreshToken as string;
+
+      const jwtTokens = await authService.refresh(jwtPayload, refreshToken);
+
+      return res.json({ data: jwtTokens });
     } catch (e) {
       next(e);
     }
