@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import {ILogin, IUser} from "../interfaces";
+import { ILogin, IUser } from "../interfaces";
 import { authService } from "../services";
 
 class AuthController {
