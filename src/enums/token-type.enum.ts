@@ -5,4 +5,5 @@ export enum ETokenType {
 
 export enum EActionTokenType {
   ACTIVATE = "activate",
+  FORGOT_PASSWORD = "forgot_password",
 }

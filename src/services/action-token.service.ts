@@ -16,6 +16,9 @@ class ActionTokenService {
       case EActionTokenType.ACTIVATE:
         secret = apiConfig.JWT_ACTION_ACTIVATE_SECRET;
         break;
+      case EActionTokenType.FORGOT_PASSWORD:
+        secret = apiConfig.JWT_ACTION_FORGOT_PASSWORD;
+        break;
       default:
         throw new ApiError("createActionToken error", 500);
     }
@@ -32,6 +35,9 @@ class ActionTokenService {
       switch (type) {
         case EActionTokenType.ACTIVATE:
           secret = apiConfig.JWT_ACTION_ACTIVATE_SECRET;
+          break;
+        case EActionTokenType.FORGOT_PASSWORD:
+          secret = apiConfig.JWT_ACTION_FORGOT_PASSWORD;
           break;
         default:
           throw new ApiError("checkActionToken error", 500);

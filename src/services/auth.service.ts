@@ -121,6 +121,44 @@ class AuthService {
 
     return jwtTokens;
   }
+
+  public async forgotPassword(user: IUser) {
+    const actionToken = actionTokenService.createActionToken(
+      { userId: user._id },
+      EActionTokenType.FORGOT_PASSWORD,
+    );
+
+    await Promise.all([
+      actionTokenRepository.createActionToken({
+        actionToken,
+        _userId: user._id,
+        tokenType: EActionTokenType.FORGOT_PASSWORD,
+      }),
+      emailService.sendMail(user.email, EEmailAction.FORGOT_PASSWORD, {
+        actionToken,
+      }),
+    ]);
+  }
+
+  public async setForgotPassword(password: string, actionToken: string) {
+    const payload = actionTokenService.checkActionToken(
+      actionToken,
+      EActionTokenType.FORGOT_PASSWORD,
+    );
+    const entity = await actionTokenRepository.getActionTokenByParams({
+      actionToken,
+    });
+    if (!entity) {
+      throw new ApiError("Not valid token", 400);
+    }
+    const newHashedPassword = await passwordService.hash(password);
+    await Promise.all([
+      userRepository.updateById(payload.userId, {
+        password: newHashedPassword,
+      }),
+      actionTokenRepository.deleteActionTokenByParams({ actionToken }),
+    ]);
+  }
 }
 
 export const authService = new AuthService();

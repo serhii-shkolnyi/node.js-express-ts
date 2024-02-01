@@ -62,6 +62,35 @@ class AuthController {
       next(e);
     }
   }
+
+  public async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.res.locals as IUser;
+
+      await authService.forgotPassword(user);
+
+      return res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async setForgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const actionToken = req.params.token;
+      const newPassword = req.body.newPassword;
+
+      await authService.setForgotPassword(newPassword, actionToken);
+
+      return res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export const authController = new AuthController();
