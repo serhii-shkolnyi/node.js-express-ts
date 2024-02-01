@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import { EActionTokenType, EEmailAction, EUserStatus } from "../enums";
 import { ApiError } from "../errors";
 import {
+  IChangePassword,
   ILogin,
   IToken,
   ITokenPayload,
@@ -158,6 +159,26 @@ class AuthService {
       }),
       actionTokenRepository.deleteActionTokenByParams({ actionToken }),
     ]);
+  }
+
+  public async changePassword(dto: IChangePassword, jwtPayload: ITokenPayload) {
+    console.log(jwtPayload);
+    const user = await userRepository.getOneByParams({ _id: jwtPayload });
+    if (!user) {
+      throw new ApiError("User not found", 404);
+    }
+
+    const isMatch = await passwordService.compare(
+      dto.oldPassword,
+      user.password,
+    );
+    if (!isMatch) {
+      throw new ApiError("Old password is invalid", 400);
+    }
+
+    const hashedNewPassword = await passwordService.hash(dto.newPassword);
+
+    await userRepository.updateById(user._id, { password: hashedNewPassword });
   }
 }
 

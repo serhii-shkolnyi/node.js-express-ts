@@ -52,4 +52,11 @@ router.put(
   authController.setForgotPassword,
 );
 
+router.post(
+  "/change-password",
+  commonMiddleware.isBodyValid(UserValidator.changePassword),
+  authMiddleware.checkAccessToken,
+  authController.changePassword,
+);
+
 export const authRouter = router;
